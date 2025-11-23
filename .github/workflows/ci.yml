@@ -1,0 +1,37 @@
+name: Sleep Health CI Pipeline (MLOps Level 2)
+
+# Bu iş akışı ne zaman çalışacak?
+# Her 'push' işleminde çalışsın.
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. GitHub'daki kodumuzu sanal makineye çek
+    - uses: actions/checkout@v3
+
+    # 2. Python 3.9 kurulumu yap
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.9"
+
+    # 3. Kütüphaneleri yükle
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install dvc
+
+    # 4. DVC ile veriyi çek (Şimdilik lokal dosyadan çalıştığı için bu adımı atlayabiliriz ama yapı kalsın)
+    # Gerçek senaryoda burada 'dvc pull' çalışır.
+    
+    # 5. Testleri Çalıştır (pytest)
+    - name: Run Tests
+      run: |
+        # pytest yerine python -m pytest kullanıyoruz ki 'src' modülünü bulabilsin
+        python -m pytest tests/

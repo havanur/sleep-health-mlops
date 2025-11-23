@@ -1,6 +1,5 @@
 name: Sleep Health CI Pipeline (MLOps Level 2)
 
-# Bu iş akışı 'master' dalına her push yapıldığında çalışır
 on:
   push:
     branches: [ "master" ]
@@ -10,14 +9,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. GitHub'daki kodları sanal makineye çek
+    # 1. Kodları çek
     - uses: actions/checkout@v3
 
-    # 2. Python 3.10 kurulumu yap (Hata veren kütüphane için 3.9'dan 3.10'a yükselttik)
-    - name: Set up Python 3.10
+    # 2. Python 3.11 Kurulumu (Senin bilgisayarınla eşitledik)
+    - name: Set up Python 3.11
       uses: actions/setup-python@v3
       with:
-        python-version: "3.10"
+        python-version: "3.11"
 
     # 3. Kütüphaneleri yükle
     - name: Install dependencies
@@ -26,14 +25,12 @@ jobs:
         pip install -r requirements.txt
         pip install dvc pytest pandas scikit-learn
 
-    # 4. Test verisini CI ortamında oluştur
-    # (Git'te veri dosyası olmadığı için testler patlamasın diye burada geçici veri üretiyoruz)
+    # 4. Test verisini oluştur
     - name: Generate Dummy Data for Testing
       run: |
         python -c "import pandas as pd; import numpy as np; import os; np.random.seed(42); os.makedirs('data', exist_ok=True); df = pd.DataFrame({'Sleep Duration': np.random.normal(7, 1.5, 100), 'Heart Rate': np.random.normal(70, 10, 100)}); df['Stress Level'] = 10 - (df['Sleep Duration']*0.8) + (df['Heart Rate']*0.05); df.to_csv('data/sleep_health.csv', index=False); print('Test verisi olusturuldu.')"
 
     # 5. Testleri Çalıştır
-    # 'python -m pytest' kullanarak src modülünün bulunmasını sağlıyoruz
     - name: Run Tests
       run: |
         python -m pytest tests/
